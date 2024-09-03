@@ -17,7 +17,7 @@ const movieDTO = (movie) => {
 // 	console.log(value)
 // }
 
-export const fetchMovieBySearch = (value) =>
-	fetch(`${BASE_URL}?apikey=${API_KEY}&s=${value}`)
+export const fetchMovieBySearch = ({value, page}) =>
+	fetch(`${BASE_URL}?apikey=${API_KEY}&s=${value}&page=${page}`)
 		.then((response) => response.json())
 		.then((data) => data.Search.map(movieDTO))

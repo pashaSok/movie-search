@@ -1,47 +1,44 @@
-import {useEffect, useState} from 'react'
-import {fetchMovieBySearch, fetchMovieByTitle} from '../api'
+import {useState} from 'react'
+import {fetchMovieBySearch} from '../api'
+import {Slider} from './components/slider'
+import {transformMovies} from './lib/format-data'
 
 export const App = () => {
 	const [movies, setMovies] = useState([])
 	const [value, setValue] = useState('')
 
-	// useEffect(() => {
-	// 	fetchMovieByTitle('batman')
-	// 		.then((response) => response.json())
-	// 		.then((data) => console.log(data))
-	// }, [])
 	const handleChange = (event) => {
 		const value = event.currentTarget.value
 		setValue(value)
 	}
 
-	const handleSubmit = () => {
-		fetchMovieBySearch(value).then((movies) => {
-			setMovies(movies)
+	const handleSubmit = (event) => {
+		event.preventDefault()
+		fetchMovieBySearch({value}).then((movies) => {
+			setMovies(transformMovies(movies))
 		})
 	}
 
-	console.log(value)
+	const handleSlideChanged = (slider) => {
+		console.log(slider)
+		const slideDetails = slider.track.details
+		if (
+			slideDetails.max - 1 > 1 &&
+			slideDetails.position === slideDetails.max - 1
+		) {
+			fetchMovieBySearch({value}).then((movies) => {
+				setMovies(transformMovies(movies))
+			})
+		}
+	}
+	console.log(movies)
 	return (
 		<div>
-			<div>
+			<Slider data={movies} onSliderChanged={handleSlideChanged} />
+			<form>
 				<input onChange={handleChange} />
 				<button onClick={handleSubmit}>search</button>
-			</div>
-			<div>
-				{movies.map((movie) => (
-					<MovieCard key={movie.id} title={movie.title} poster={movie.poster} />
-				))}
-			</div>
-		</div>
-	)
-}
-
-const MovieCard = ({title, poster}) => {
-	return (
-		<div>
-			<div>{title}</div>
-			<img src={poster} alt="" />
+			</form>
 		</div>
 	)
 }
